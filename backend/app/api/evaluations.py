@@ -13,6 +13,9 @@ from app.schemas import (
     EvaluationAnswerResponse,
     EvaluationCreate,
     EvaluationResponse,
+    PrimaryEvaluationAnswerResponse,
+    PrimaryEvaluationResponse,
+    PrimaryEvaluatorResponse,
 )
 from app.services import (
     EvaluationAlreadyExistsError,
@@ -92,6 +95,59 @@ def create_evaluation(
         answers=[
             EvaluationAnswerResponse(
                 question_id=answer.question_id,
+                score=answer.score,
+                weight=answer.weight,
+            )
+            for answer in record.answers
+        ],
+    )
+
+
+@router.get(
+    "/employees/{employee_id}/evaluations/latest",
+    response_model=PrimaryEvaluationResponse | None,
+    summary="Visualizar avaliação principal",
+    response_description="Avaliação principal do funcionário ou resultado vazio.",
+)
+def get_primary_evaluation(
+    employee_id: int,
+    acting_employee: Employee = Depends(get_acting_employee),
+    service: EvaluationService = Depends(get_evaluation_service),
+) -> PrimaryEvaluationResponse | None:
+    try:
+        record = service.get_primary_evaluation(
+            acting_employee_id=acting_employee.id,
+            employee_id=employee_id,
+        )
+    except TargetEmployeeNotFoundError as error:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Funcionário não encontrado.",
+        ) from error
+    except EvaluationForbiddenError as error:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Você não pode visualizar as avaliações deste funcionário.",
+        ) from error
+
+    if record is None:
+        return None
+
+    return PrimaryEvaluationResponse(
+        id=record.id,
+        employee_id=record.employee_id,
+        evaluator=PrimaryEvaluatorResponse(
+            id=record.evaluator.id,
+            name=record.evaluator.name,
+            position_name=record.evaluator.position_name,
+        ),
+        week_reference=record.week_reference,
+        created_at=record.created_at,
+        total_score=record.total_score,
+        answers=[
+            PrimaryEvaluationAnswerResponse(
+                question_id=answer.question_id,
+                question_text=answer.question_text,
                 score=answer.score,
                 weight=answer.weight,
             )

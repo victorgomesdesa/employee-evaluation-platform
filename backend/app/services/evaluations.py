@@ -9,6 +9,7 @@ from app.repositories import (
     EvaluationQuestionRepository,
     EvaluationRecord,
     EvaluationRepository,
+    PrimaryEvaluationRecord,
     WeeklyEvaluationConflictError,
 )
 from app.services.hierarchy import HierarchyService
@@ -86,6 +87,24 @@ class EvaluationService:
             )
         except WeeklyEvaluationConflictError as error:
             raise EvaluationAlreadyExistsError from error
+
+    def get_primary_evaluation(
+        self,
+        *,
+        acting_employee_id: int,
+        employee_id: int,
+    ) -> PrimaryEvaluationRecord | None:
+        target_employee = self._evaluation_repository.get_employee(employee_id)
+        if target_employee is None:
+            raise TargetEmployeeNotFoundError
+
+        if not self._hierarchy_service.is_subordinate(
+            acting_employee_id,
+            employee_id,
+        ):
+            raise EvaluationForbiddenError
+
+        return self._evaluation_repository.get_primary(employee_id)
 
     @staticmethod
     def _validate_and_snapshot_answers(

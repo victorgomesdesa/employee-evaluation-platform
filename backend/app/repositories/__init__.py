@@ -4,6 +4,9 @@ from app.repositories.evaluations import (
     EvaluationAnswerRecord,
     EvaluationRecord,
     EvaluationRepository,
+    EvaluatorRecord,
+    PrimaryEvaluationAnswerRecord,
+    PrimaryEvaluationRecord,
     WeeklyEvaluationConflictError,
 )
 from app.repositories.hierarchy import (
@@ -18,8 +21,11 @@ __all__ = [
     "EvaluationAnswerRecord",
     "EvaluationRecord",
     "EvaluationRepository",
+    "EvaluatorRecord",
     "HierarchyRepository",
     "LeaderRecord",
+    "PrimaryEvaluationAnswerRecord",
+    "PrimaryEvaluationRecord",
     "SubordinateRecord",
     "WeeklyEvaluationConflictError",
 ]

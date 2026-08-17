@@ -4,6 +4,9 @@ from app.schemas.evaluations import (
     EvaluationAnswerResponse,
     EvaluationCreate,
     EvaluationResponse,
+    PrimaryEvaluationAnswerResponse,
+    PrimaryEvaluationResponse,
+    PrimaryEvaluatorResponse,
 )
 from app.schemas.hierarchy import LeaderResponse, Relationship, SubordinateResponse
 
@@ -13,6 +16,9 @@ __all__ = [
     "EvaluationAnswerResponse",
     "EvaluationCreate",
     "EvaluationResponse",
+    "PrimaryEvaluationAnswerResponse",
+    "PrimaryEvaluationResponse",
+    "PrimaryEvaluatorResponse",
     "LeaderResponse",
     "Relationship",
     "SubordinateResponse",

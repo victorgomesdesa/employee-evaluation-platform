@@ -35,3 +35,32 @@ class EvaluationResponse(BaseModel):
     created_at: datetime = Field(alias="createdAt")
     total_score: Decimal = Field(alias="totalScore")
     answers: list[EvaluationAnswerResponse]
+
+
+class PrimaryEvaluatorResponse(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
+    id: int
+    name: str
+    position_name: str = Field(alias="positionName")
+
+
+class PrimaryEvaluationAnswerResponse(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
+    question_id: int = Field(alias="questionId")
+    question_text: str = Field(alias="questionText")
+    score: int
+    weight: int
+
+
+class PrimaryEvaluationResponse(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
+    id: int
+    employee_id: int = Field(alias="employeeId")
+    evaluator: PrimaryEvaluatorResponse
+    week_reference: date = Field(alias="weekReference")
+    created_at: datetime = Field(alias="createdAt")
+    total_score: Decimal = Field(alias="totalScore")
+    answers: list[PrimaryEvaluationAnswerResponse]
