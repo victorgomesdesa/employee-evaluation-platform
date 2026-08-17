@@ -6,9 +6,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     app_env: str = "development"
     app_name: str = "API da Plataforma de Avaliação de Funcionários"
-    database_url: str = (
-        "postgresql+psycopg://postgres:postgres@localhost:5432/employee_evaluation"
-    )
+    database_url: str
+    test_database_url: str | None = None
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
