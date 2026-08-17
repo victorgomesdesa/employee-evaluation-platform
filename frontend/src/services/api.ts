@@ -3,6 +3,7 @@ import type {
   CreateEvaluationRequest,
   EvaluationQuestion,
   EvaluationResponse,
+  PrimaryEvaluation,
 } from "../types/evaluation";
 
 export class ApiError extends Error {
@@ -74,5 +75,17 @@ export function createEvaluation(
       },
       body: JSON.stringify(evaluation),
     },
+  );
+}
+
+export function getLatestEvaluation(
+  actingLeaderId: number,
+  employeeId: number,
+  signal?: AbortSignal,
+): Promise<PrimaryEvaluation | null> {
+  return protectedRequest<PrimaryEvaluation | null>(
+    `/api/employees/${employeeId}/evaluations/latest`,
+    actingLeaderId,
+    { signal },
   );
 }

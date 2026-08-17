@@ -7,6 +7,7 @@ interface TeamSectionProps {
   employees: Subordinate[];
   emptyMessage: string;
   onEvaluate: (employee: Subordinate) => void;
+  onViewEvaluation: (employee: Subordinate) => void;
 }
 
 export function TeamSection({
@@ -15,6 +16,7 @@ export function TeamSection({
   employees,
   emptyMessage,
   onEvaluate,
+  onViewEvaluation,
 }: TeamSectionProps) {
   const countLabel = `${employees.length} ${
     employees.length === 1 ? "funcionário" : "funcionários"
@@ -38,6 +40,7 @@ export function TeamSection({
               key={employee.id}
               employee={employee}
               onEvaluate={onEvaluate}
+              onViewEvaluation={onViewEvaluation}
             />
           ))}
         </div>

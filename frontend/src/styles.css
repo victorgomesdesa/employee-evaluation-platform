@@ -363,7 +363,7 @@ h1 {
   gap: 0.65rem;
 }
 
-.evaluate-button,
+.card-action-button,
 .back-button,
 .theme-toggle {
   border: 0;
@@ -372,14 +372,21 @@ h1 {
   font-weight: 750;
 }
 
-.evaluate-button {
+.card-action-button {
   padding: 0.35rem 0.15rem;
 }
 
-.evaluate-button:hover,
+.card-action-button:hover,
 .back-button:hover {
   text-decoration: underline;
   text-underline-offset: 0.2rem;
+}
+
+.employee-action-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.8rem;
+  white-space: nowrap;
 }
 
 .theme-toggle {
@@ -694,6 +701,260 @@ h1 {
   font-weight: 900;
 }
 
+.employee-evaluation-page {
+  width: min(100% - 2rem, 64rem);
+  margin: 0 auto;
+  padding: clamp(5rem, 8vw, 6rem) 0 4rem;
+}
+
+.employee-detail-header {
+  padding-bottom: 2rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.employee-detail-header > .back-button {
+  display: block;
+  margin: 0 0 2rem;
+  padding: 0;
+}
+
+.employee-profile {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0.8rem;
+}
+
+.profile-avatar {
+  display: grid;
+  flex: 0 0 auto;
+  width: 4rem;
+  height: 4rem;
+  place-items: center;
+  border-radius: 1rem;
+  color: var(--primary);
+  background: var(--primary-soft);
+  font-size: 1.5rem;
+  font-weight: 850;
+}
+
+.employee-profile h1 {
+  margin-bottom: 0.2rem;
+}
+
+.employee-profile p {
+  margin-bottom: 0.2rem;
+  color: var(--text-muted);
+}
+
+.employee-profile a {
+  color: var(--text-muted);
+  overflow-wrap: anywhere;
+}
+
+.detail-context {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 1.25rem;
+  margin-top: 1.5rem;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.detail-context strong {
+  color: var(--text-strong);
+}
+
+.primary-evaluation-content {
+  display: grid;
+  gap: 2rem;
+  padding-top: 2rem;
+}
+
+.evaluation-summary,
+.empty-evaluation-card {
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+}
+
+.evaluation-summary {
+  overflow: hidden;
+}
+
+.summary-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.summary-heading h2 {
+  margin: 0.45rem 0 0;
+}
+
+.total-score {
+  display: grid;
+  min-width: 8rem;
+  padding: 0.8rem 1rem;
+  border-radius: 0.8rem;
+  justify-items: center;
+  color: var(--primary);
+  background: var(--primary-soft);
+}
+
+.total-score span,
+.total-score small {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.total-score strong {
+  font-size: 2rem;
+  line-height: 1.15;
+}
+
+.evaluation-metadata {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr;
+  margin: 0;
+  padding: 1.5rem;
+}
+
+.evaluation-metadata > div {
+  min-width: 0;
+  padding: 0 1.25rem;
+  border-left: 1px solid var(--border);
+}
+
+.evaluation-metadata > div:first-child {
+  padding-left: 0;
+  border-left: 0;
+}
+
+.evaluation-metadata dt {
+  margin-bottom: 0.35rem;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 750;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.evaluation-metadata dd {
+  margin: 0;
+  color: var(--text-strong);
+  font-weight: 700;
+  line-height: 1.45;
+}
+
+.answers-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.answers-heading h2 {
+  margin-bottom: 0;
+  font-size: 1.25rem;
+}
+
+.answers-heading span {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.answer-list {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.evaluation-answer-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 1rem;
+  padding: 1.15rem 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: 0.85rem;
+  background: var(--surface);
+}
+
+.answer-order {
+  display: grid;
+  width: 2.25rem;
+  height: 2.25rem;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--primary);
+  background: var(--primary-soft);
+  font-size: 0.8rem;
+  font-weight: 850;
+}
+
+.evaluation-answer-card h3 {
+  margin-bottom: 0.45rem;
+  font-size: 1rem;
+}
+
+.answer-metadata {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.25rem;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.answer-metadata strong {
+  color: var(--text-strong);
+}
+
+.detail-actions,
+.detail-error-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.empty-evaluation-card {
+  display: grid;
+  justify-items: center;
+  gap: 0.75rem;
+  margin-top: 2rem;
+  padding: clamp(2rem, 6vw, 3.5rem);
+  text-align: center;
+}
+
+.empty-evaluation-card h2,
+.empty-evaluation-card p {
+  margin-bottom: 0;
+}
+
+.empty-evaluation-card p {
+  color: var(--text-muted);
+}
+
+.empty-evaluation-card .primary-button {
+  margin-top: 0.5rem;
+}
+
+.empty-evaluation-icon {
+  display: grid;
+  width: 3rem;
+  height: 3rem;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--text-muted);
+  background: var(--surface-subtle);
+  font-weight: 900;
+}
+
 @keyframes spin {
   to {
     transform: rotate(360deg);
@@ -717,6 +978,23 @@ h1 {
   .score-options {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .evaluation-metadata {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .evaluation-metadata > div,
+  .evaluation-metadata > div:first-child {
+    padding: 0 0 1rem;
+    border-bottom: 1px solid var(--border);
+    border-left: 0;
+  }
+
+  .evaluation-metadata > div:last-child {
+    padding-bottom: 0;
+    border-bottom: 0;
+  }
 }
 
 @media (max-width: 480px) {
@@ -729,7 +1007,8 @@ h1 {
   }
 
   .team-page,
-  .evaluation-page {
+  .evaluation-page,
+  .employee-evaluation-page {
     width: min(100% - 1.25rem, 76rem);
     padding-top: 5rem;
   }
@@ -741,6 +1020,11 @@ h1 {
   .employee-actions {
     grid-column: 2;
     justify-items: start;
+  }
+
+  .employee-action-buttons {
+    flex-wrap: wrap;
+    justify-content: flex-start;
   }
 
   .theme-toggle {
@@ -761,6 +1045,21 @@ h1 {
   .form-actions .primary-button,
   .form-actions .secondary-button {
     width: 100%;
+  }
+
+  .summary-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .total-score {
+    justify-self: start;
+  }
+
+  .detail-actions,
+  .detail-error-actions {
+    align-items: stretch;
+    flex-direction: column-reverse;
   }
 }
 

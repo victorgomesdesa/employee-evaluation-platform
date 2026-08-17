@@ -8,12 +8,14 @@ interface TeamPageProps {
   leader: Leader;
   onChangeLeader: () => void;
   onEvaluate: (employee: Subordinate) => void;
+  onViewEvaluation: (employee: Subordinate) => void;
 }
 
 export function TeamPage({
   leader,
   onChangeLeader,
   onEvaluate,
+  onViewEvaluation,
 }: TeamPageProps) {
   const [subordinates, setSubordinates] = useState<Subordinate[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -108,6 +110,7 @@ export function TeamPage({
             employees={directEmployees}
             emptyMessage="Nenhum subordinado direto encontrado."
             onEvaluate={onEvaluate}
+            onViewEvaluation={onViewEvaluation}
           />
           <TeamSection
             id="indirect-team-title"
@@ -115,6 +118,7 @@ export function TeamPage({
             employees={indirectEmployees}
             emptyMessage="Nenhum subordinado indireto encontrado."
             onEvaluate={onEvaluate}
+            onViewEvaluation={onViewEvaluation}
           />
         </div>
       )}

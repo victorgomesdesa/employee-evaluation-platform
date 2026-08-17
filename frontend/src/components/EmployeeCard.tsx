@@ -3,9 +3,14 @@ import type { Subordinate } from "../types/hierarchy";
 interface EmployeeCardProps {
   employee: Subordinate;
   onEvaluate: (employee: Subordinate) => void;
+  onViewEvaluation: (employee: Subordinate) => void;
 }
 
-export function EmployeeCard({ employee, onEvaluate }: EmployeeCardProps) {
+export function EmployeeCard({
+  employee,
+  onEvaluate,
+  onViewEvaluation,
+}: EmployeeCardProps) {
   const relationshipLabel =
     employee.relationship === "direct"
       ? "Direto"
@@ -25,14 +30,24 @@ export function EmployeeCard({ employee, onEvaluate }: EmployeeCardProps) {
         <span className={`relationship-badge ${employee.relationship}`}>
           {relationshipLabel}
         </span>
-        <button
-          className="evaluate-button"
-          type="button"
-          onClick={() => onEvaluate(employee)}
-          aria-label={`Avaliar ${employee.name}`}
-        >
-          Avaliar
-        </button>
+        <div className="employee-action-buttons">
+          <button
+            className="card-action-button"
+            type="button"
+            onClick={() => onViewEvaluation(employee)}
+            aria-label={`Ver avaliação de ${employee.name}`}
+          >
+            Ver avaliação
+          </button>
+          <button
+            className="card-action-button"
+            type="button"
+            onClick={() => onEvaluate(employee)}
+            aria-label={`Avaliar ${employee.name}`}
+          >
+            Avaliar
+          </button>
+        </div>
       </div>
     </article>
   );

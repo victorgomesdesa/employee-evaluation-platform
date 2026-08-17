@@ -32,3 +32,26 @@ export interface EvaluationResponse {
   totalScore: string;
   answers: EvaluationAnswerResponse[];
 }
+
+export interface PrimaryEvaluationAnswer {
+  questionId: number;
+  questionText: string;
+  score: Score;
+  weight: number;
+}
+
+export interface EvaluationAuthor {
+  id: number;
+  name: string;
+  positionName: string;
+}
+
+export interface PrimaryEvaluation {
+  id: number;
+  employeeId: number;
+  evaluator: EvaluationAuthor;
+  weekReference: string;
+  createdAt: string;
+  totalScore: string;
+  answers: PrimaryEvaluationAnswer[];
+}

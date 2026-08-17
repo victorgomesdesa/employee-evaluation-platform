@@ -5,6 +5,7 @@ import { ThemeToggle } from "./components/ThemeToggle";
 import { useActingLeader } from "./hooks/useActingLeader";
 import { useTheme } from "./hooks/useTheme";
 import { EvaluationPage } from "./pages/EvaluationPage";
+import { EmployeeEvaluationPage } from "./pages/EmployeeEvaluationPage";
 import { TeamPage } from "./pages/TeamPage";
 import type { Subordinate } from "./types/hierarchy";
 
@@ -21,6 +22,7 @@ export function App() {
   const { theme, toggleTheme } = useTheme();
   const [employeeToEvaluate, setEmployeeToEvaluate] =
     useState<Subordinate | null>(null);
+  const [employeeToView, setEmployeeToView] = useState<Subordinate | null>(null);
 
   let content: ReactNode;
 
@@ -60,13 +62,27 @@ export function App() {
         onBack={() => setEmployeeToEvaluate(null)}
       />
     );
+  } else if (employeeToView) {
+    content = (
+      <EmployeeEvaluationPage
+        leader={selectedLeader}
+        employee={employeeToView}
+        onBack={() => setEmployeeToView(null)}
+        onEvaluate={() => {
+          setEmployeeToView(null);
+          setEmployeeToEvaluate(employeeToView);
+        }}
+      />
+    );
   } else {
     content = (
       <TeamPage
         leader={selectedLeader}
         onEvaluate={setEmployeeToEvaluate}
+        onViewEvaluation={setEmployeeToView}
         onChangeLeader={() => {
           setEmployeeToEvaluate(null);
+          setEmployeeToView(null);
           clearLeader();
         }}
       />
