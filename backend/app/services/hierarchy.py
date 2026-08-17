@@ -36,3 +36,9 @@ class HierarchyService:
             )
             for record in records
         ]
+
+    def is_subordinate(self, leader_id: int, employee_id: int) -> bool:
+        return any(
+            record.id == employee_id
+            for record in self._repository.get_subordinates(leader_id)
+        )
