@@ -6,6 +6,7 @@ interface TeamSectionProps {
   title: string;
   employees: Subordinate[];
   emptyMessage: string;
+  onEvaluate: (employee: Subordinate) => void;
 }
 
 export function TeamSection({
@@ -13,6 +14,7 @@ export function TeamSection({
   title,
   employees,
   emptyMessage,
+  onEvaluate,
 }: TeamSectionProps) {
   const countLabel = `${employees.length} ${
     employees.length === 1 ? "funcionário" : "funcionários"
@@ -32,7 +34,11 @@ export function TeamSection({
       ) : (
         <div className="employee-grid">
           {employees.map((employee) => (
-            <EmployeeCard key={employee.id} employee={employee} />
+            <EmployeeCard
+              key={employee.id}
+              employee={employee}
+              onEvaluate={onEvaluate}
+            />
           ))}
         </div>
       )}

@@ -1,4 +1,16 @@
 import type { Leader, Subordinate } from "../types/hierarchy";
+import type {
+  CreateEvaluationRequest,
+  EvaluationQuestion,
+  EvaluationResponse,
+} from "../types/evaluation";
+
+export class ApiError extends Error {
+  constructor(public readonly status: number) {
+    super(`API request failed with status ${status}`);
+    this.name = "ApiError";
+  }
+}
 
 async function request<T>(
   path: string,
@@ -7,7 +19,7 @@ async function request<T>(
   const response = await fetch(path, options);
 
   if (!response.ok) {
-    throw new Error(`API request failed with status ${response.status}`);
+    throw new ApiError(response.status);
   }
 
   return response.json() as Promise<T>;
@@ -20,13 +32,14 @@ export function getLeaders(signal?: AbortSignal): Promise<Leader[]> {
 function protectedRequest<T>(
   path: string,
   actingLeaderId: number,
-  signal?: AbortSignal,
+  options: RequestInit = {},
 ): Promise<T> {
+  const headers = new Headers(options.headers);
+  headers.set("X-Leader-Id", String(actingLeaderId));
+
   return request<T>(path, {
-    signal,
-    headers: {
-      "X-Leader-Id": String(actingLeaderId),
-    },
+    ...options,
+    headers,
   });
 }
 
@@ -37,6 +50,29 @@ export function getSubordinates(
   return protectedRequest<Subordinate[]>(
     "/api/me/subordinates",
     actingLeaderId,
-    signal,
+    { signal },
+  );
+}
+
+export function getEvaluationQuestions(
+  signal?: AbortSignal,
+): Promise<EvaluationQuestion[]> {
+  return request<EvaluationQuestion[]>("/api/evaluation/questions", { signal });
+}
+
+export function createEvaluation(
+  actingLeaderId: number,
+  evaluation: CreateEvaluationRequest,
+): Promise<EvaluationResponse> {
+  return protectedRequest<EvaluationResponse>(
+    "/api/evaluations",
+    actingLeaderId,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(evaluation),
+    },
   );
 }

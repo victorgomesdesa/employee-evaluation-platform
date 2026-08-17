@@ -7,9 +7,14 @@ import type { Leader, Subordinate } from "../types/hierarchy";
 interface TeamPageProps {
   leader: Leader;
   onChangeLeader: () => void;
+  onEvaluate: (employee: Subordinate) => void;
 }
 
-export function TeamPage({ leader, onChangeLeader }: TeamPageProps) {
+export function TeamPage({
+  leader,
+  onChangeLeader,
+  onEvaluate,
+}: TeamPageProps) {
   const [subordinates, setSubordinates] = useState<Subordinate[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -102,12 +107,14 @@ export function TeamPage({ leader, onChangeLeader }: TeamPageProps) {
             title="Subordinados diretos"
             employees={directEmployees}
             emptyMessage="Nenhum subordinado direto encontrado."
+            onEvaluate={onEvaluate}
           />
           <TeamSection
             id="indirect-team-title"
             title="Subordinados indiretos"
             employees={indirectEmployees}
             emptyMessage="Nenhum subordinado indireto encontrado."
+            onEvaluate={onEvaluate}
           />
         </div>
       )}
