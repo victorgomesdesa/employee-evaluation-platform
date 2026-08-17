@@ -168,13 +168,20 @@ def test_evaluation_answer_weight_is_independent_snapshot(
 
 
 @pytest.mark.integration
+@pytest.mark.parametrize(
+    ("evaluator_id", "employee_id"),
+    [(999999, 4), (2, 999999)],
+    ids=["evaluator", "employee"],
+)
 def test_evaluation_employee_foreign_keys_are_enforced(
     database_session: Session,
+    evaluator_id: int,
+    employee_id: int,
 ) -> None:
     database_session.add(
         Evaluation(
-            evaluator_id=999999,
-            employee_id=4,
+            evaluator_id=evaluator_id,
+            employee_id=employee_id,
             week_reference=date(2026, 8, 10),
             total_score=Decimal("3.10"),
         )

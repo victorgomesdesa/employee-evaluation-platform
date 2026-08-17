@@ -159,6 +159,13 @@ def test_subordinate_without_evaluation_returns_null(api_client: TestClient) -> 
     assert response.json() is None
 
 
+def test_latest_evaluation_requires_acting_identity(api_client: TestClient) -> None:
+    response = api_client.get("/api/employees/4/evaluations/latest")
+
+    assert response.status_code == 400
+    assert response.json() == {"detail": "X-Leader-Id é obrigatório."}
+
+
 @pytest.mark.integration
 def test_nonexistent_target_returns_not_found(api_client: TestClient) -> None:
     response = get_latest_evaluation(
@@ -327,3 +334,17 @@ def test_global_organizational_depths_match_fixture(database_session: Session) -
     assert repository.get_global_depth(4) == 2
     assert repository.get_global_depth(8) == 3
     assert repository.get_global_depth(10) == 4
+
+
+def test_evaluation_routes_are_immutable(api_client: TestClient) -> None:
+    evaluation_paths = {
+        path: operations
+        for path, operations in api_client.app.openapi()["paths"].items()
+        if "evaluations" in path
+    }
+
+    assert evaluation_paths
+    assert all(
+        {"put", "patch", "delete"}.isdisjoint(operations)
+        for operations in evaluation_paths.values()
+    )

@@ -113,6 +113,10 @@ def test_direct_subordinate_evaluation_is_created_atomically(
         database_session.scalar(select(func.count()).select_from(EvaluationAnswer))
         == 6
     )
+    stored_evaluation = database_session.scalar(select(Evaluation))
+    assert stored_evaluation is not None
+    assert stored_evaluation.week_reference == date(2026, 8, 17)
+    assert stored_evaluation.total_score == Decimal("3.10")
 
 
 @pytest.mark.integration
@@ -304,6 +308,20 @@ def test_question_set_must_match_persisted_questions(
     assert response.status_code == 422
 
 
+@pytest.mark.parametrize("score", [1, 2, 3, 4])
+def test_score_validation_accepts_strict_integer_values(
+    evaluation_client: TestClient,
+    score: int,
+) -> None:
+    payload = valid_payload()
+    payload["answers"][0]["score"] = score
+
+    response = submit_evaluation(evaluation_client, payload=payload)
+
+    assert response.status_code == 201
+    assert response.json()["answers"][0]["score"] == score
+
+
 @pytest.mark.parametrize(
     "invalid_score",
     [0, 5, -1, 2.5, "3", None, True, False],
@@ -353,6 +371,62 @@ def test_client_provided_answer_weight_is_rejected(
     response = submit_evaluation(evaluation_client, payload=payload)
 
     assert response.status_code == 422
+
+
+@pytest.mark.parametrize("location", ["top-level", "nested"])
+def test_unknown_request_fields_are_rejected(
+    evaluation_client: TestClient,
+    location: str,
+) -> None:
+    payload = valid_payload()
+    if location == "top-level":
+        payload["unexpected"] = "value"
+    else:
+        payload["answers"][0]["unexpected"] = "value"
+
+    response = submit_evaluation(evaluation_client, payload=payload)
+
+    assert response.status_code == 422
+    assert response.json() == {"detail": "Dados da requisição inválidos."}
+
+
+@pytest.mark.parametrize(
+    ("leader_id", "employee_id", "expected_status"),
+    [(4, 5, 403), (2, 999999, 404)],
+    ids=["authorization-before-answer-set", "existence-before-answer-set"],
+)
+def test_target_validation_precedes_answer_set_validation(
+    evaluation_client: TestClient,
+    leader_id: int,
+    employee_id: int,
+    expected_status: int,
+) -> None:
+    payload = valid_payload(employee_id=employee_id)
+    payload["answers"][-1]["questionId"] = 1
+
+    response = submit_evaluation(
+        evaluation_client,
+        leader_id=leader_id,
+        payload=payload,
+    )
+
+    assert response.status_code == expected_status
+
+
+def test_weekly_conflict_precedes_answer_set_validation(
+    evaluation_client: TestClient,
+) -> None:
+    first_response = submit_evaluation(evaluation_client)
+    invalid_payload = valid_payload()
+    invalid_payload["answers"][-1]["questionId"] = 1
+
+    second_response = submit_evaluation(
+        evaluation_client,
+        payload=invalid_payload,
+    )
+
+    assert first_response.status_code == 201
+    assert second_response.status_code == 409
 
 
 @pytest.mark.integration
