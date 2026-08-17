@@ -5,8 +5,8 @@ Documento complementar ao [`technical-design.md`](./technical-design.md). O desi
 isso**.
 
 Todo critério de aceitação é escrito para ser executável, e todo cenário de teste da
-[§10](#10-cenários-de-teste-derivados) deriva de um deles. O escopo se limita ao que o desafio pede
-a [§11.2](#112-fora-do-escopo-deliberadamente) registra o que foi considerado e deixado de fora.
+[§10](#10-cenários-de-teste-derivados) deriva de um deles. O escopo se limita ao que o desafio pede,
+e a [§11.2](#112-fora-do-escopo-deliberadamente) registra o que foi considerado e deixado de fora.
 
 ---
 
@@ -152,8 +152,8 @@ Alice (CEO)                              profundidade 0
 > ancestrais e, em uma árvore, cada ancestral está em uma profundidade distinta, portanto, com este
 > seed, um empate de profundidade não ocorre. O critério de desempate continua importando:
 > `LeaderLead` permite que um funcionário tenha mais de um líder, então a ordenação precisa ser total
-> e determinística independentemente dos dados. Por isso ele é verificado como teste unitário do
-> comparador (T-05.4), e não por uma fixture incapaz de representá-lo.
+> e determinística independentemente dos dados. Por isso ele é verificado por um teste de integração
+> da ordenação (T-05.4), com dados controlados para representar o empate.
 
 ### 3.3 Perguntas do Seed
 
@@ -224,14 +224,15 @@ subordinados for solicitada, então a API responde `200 OK` com lista vazia. Um 
 > **quero** abrir o perfil de um subordinado,
 > **para** saber quem estou prestes a avaliar.
 
-**AC-03.1**: Dado o líder `Bob` e o subordinado `James`, quando os detalhes forem solicitados, então
-a API retorna `name`, `email` e `positionName` de `James`.
+**AC-03.1**: Dado o líder `Bob` e o subordinado `James`, quando a subárvore for solicitada, então o
+registro de `James` contém `name`, `email` e `positionName`, e a interface usa esses dados para exibir
+seu perfil sem uma segunda rota de detalhes.
 
-**AC-03.2**: Dado o líder `David`, quando os detalhes forem solicitados para `Eva` (par), `Bob`
-(superior) ou `David` (ele próprio), então a API responde `403 Forbidden`.
+**AC-03.2**: Dado o líder `David`, quando uma operação protegida de avaliação for solicitada para
+`Eva` (par), `Bob` (superior) ou `David` (ele próprio), então a API responde `403 Forbidden`.
 
-**AC-03.3**: Dado qualquer líder, quando os detalhes forem solicitados para um id de funcionário
-inexistente, então a API responde `404 Not Found`.
+**AC-03.3**: Dado qualquer líder, quando uma operação protegida de avaliação for solicitada para um
+id de funcionário inexistente, então a API responde `404 Not Found`.
 
 **AC-03.4**: Dada uma rota protegida, quando `X-Leader-Id` estiver ausente ou malformado, então a API
 responde `400 Bad Request` sem precisar acessar o banco de dados.
@@ -414,9 +415,9 @@ Cada cenário existe **por causa** do critério indicado na primeira coluna.
 
 | ID | Critério | Cenário | Nível | Esperado |
 |---|---|---|---|---|
-| T-03.1 | AC-03.1 | `Bob` abre `James` | I | `200 OK` + perfil |
-| T-03.2 | AC-03.2 | `David` abre `Eva` / `Bob` / `David` | I | `403` em cada caso |
-| T-03.3 | AC-03.3 | Qualquer líder abre o id `999999` | I | `404` |
+| T-03.1 | AC-03.1 | `Bob` lista e abre `James` | I | `200 OK` + dados de perfil na subárvore |
+| T-03.2 | AC-03.2 | `David` tenta avaliar ou consultar `Eva` / `Bob` / `David` | I | `403` em cada caso |
+| T-03.3 | AC-03.3 | Operação protegida usa o id `999999` | I | `404` |
 | T-03.4a | AC-03.4 | `X-Leader-Id` ausente ou malformado | I | `400`, sem acesso ao banco |
 | T-03.4b | AC-03.5 | `X-Leader-Id` válido, mas funcionário inexistente | I | `400`; pode consultar a identidade, sem operação de negócio ou escrita |
 
@@ -467,7 +468,7 @@ Os três casos de A-2, testados explicitamente.
 | T-05.1 | AC-05.1 | `Bob → Henry` em W1, `David → Henry` em W2 | I | A avaliação de `David` em **W2** é a principal, a semana mais recente vence a hierarquia |
 | T-05.2 | AC-05.2 | `Bob → Henry` e `David → Henry`, ambos em W2 | I | A avaliação de `Bob` é a principal, a hierarquia vence dentro da semana |
 | T-05.3 | AC-05.3 | Qualquer um dos cenários acima, inspecionando o armazenamento | I | Os dois registros presentes e inalterados |
-| T-05.4 | AC-05.4 | Comparador com duas entradas, mesma semana e mesmo `evaluatorDepth` | U | `createdAt` mais recente ordenado primeiro |
+| T-05.4 | AC-05.4 | Ordenação com duas entradas, mesma semana e mesmo `evaluatorDepth` | I | `createdAt` mais recente ordenado primeiro |
 | T-05.5 | AC-05.5 | `Liam` nunca avaliado | I | `200`, resultado vazio |
 | T-05.6 | AC-05.6 | `David` lê avaliação de `Eva` / `Bob` / `David` | I | `403` |
 

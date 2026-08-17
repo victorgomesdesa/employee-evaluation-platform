@@ -63,7 +63,7 @@
 
 body {
   margin: 0;
-  min-width: 320px;
+  min-width: 0;
   min-height: 100vh;
   color: var(--text);
   background: var(--page-background);
@@ -210,9 +210,13 @@ h1 {
   background: var(--surface);
 }
 
-.secondary-button:hover {
+.secondary-button:hover:not(:disabled) {
   border-color: var(--primary);
   background: var(--surface-subtle);
+}
+
+.secondary-button:disabled {
+  opacity: 0.5;
 }
 
 .selector-form .primary-button {

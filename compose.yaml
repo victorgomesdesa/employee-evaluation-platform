@@ -48,6 +48,7 @@ services:
       - "${BACKEND_PORT:-8000}:8000"
     volumes:
       - ./backend:/app
+      - backend_pytest_cache:/app/.pytest_cache
     depends_on:
       postgres:
         condition: service_healthy
@@ -101,5 +102,6 @@ services:
 
 volumes:
   postgres_data:
+  backend_pytest_cache:
   frontend_node_modules:
   frontend_dist:

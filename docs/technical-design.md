@@ -260,10 +260,12 @@ cabeçalho.
 | `GET` | `/api/leaders` | Não | Funcionários com ao menos um subordinado; permite escolher o líder inicial |
 | `GET` | `/api/evaluation/questions` | Não | Seis perguntas fixas do seed, ordenadas por `displayOrder` |
 | `GET` | `/api/me/subordinates` | Sim | Subárvore do líder ativo, com marcação `direct` / `indirect` |
-| `GET` | `/api/employees/{id}` | Sim | Detalhes de um subordinado |
 | `POST` | `/api/evaluations` | Sim | Cria uma avaliação |
 | `GET` | `/api/employees/{id}/evaluations/latest` | Sim | Avaliação principal ([§3.7](#37-avaliação-principal)) |
-| `GET` | `/api/employees/{id}/evaluations` | Sim | Histórico completo *(escopo opcional)* |
+
+Os dados de perfil usados pelo frontend já fazem parte da resposta de `/api/me/subordinates`; não
+há um endpoint separado de detalhes. O histórico de avaliações é opcional no desafio e não foi
+exposto nesta implementação.
 
 **Corpo de `POST /api/evaluations`:**
 

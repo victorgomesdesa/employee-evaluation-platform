@@ -88,6 +88,9 @@ export function EvaluationPage({
       ),
     [questions],
   );
+  const isFormComplete =
+    orderedQuestions.length === 6 &&
+    orderedQuestions.every((question) => scores[question.id] !== undefined);
 
   function updateScore(questionId: number, score: Score) {
     setScores((currentScores) => ({
@@ -101,11 +104,7 @@ export function EvaluationPage({
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    const hasMissingAnswers =
-      orderedQuestions.length === 0 ||
-      orderedQuestions.some((question) => scores[question.id] === undefined);
-
-    if (hasMissingAnswers) {
+    if (!isFormComplete) {
       setValidationError(
         "Responda todas as perguntas antes de enviar a avaliação.",
       );
@@ -227,7 +226,7 @@ export function EvaluationPage({
               <button
                 className="primary-button"
                 type="submit"
-                disabled={isSubmitting}
+                disabled={isSubmitting || !isFormComplete}
               >
                 {isSubmitting ? "Enviando..." : "Enviar avaliação"}
               </button>

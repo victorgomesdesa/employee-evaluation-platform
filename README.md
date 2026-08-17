@@ -123,8 +123,9 @@ Para encerrar os containers preservando os dados:
 docker compose down
 ```
 
-Para remover também o volume do banco de desenvolvimento e começar novamente, use
-`docker compose down --volumes`. Esse comando apaga os dados locais mantidos pelo Compose.
+Para remover todos os volumes do ambiente e começar novamente, use
+`docker compose down --volumes`. Esse comando apaga o banco de desenvolvimento e também os volumes
+descartáveis de dependências, build e cache mantidos pelo Compose.
 
 ## Executando sem Docker
 
