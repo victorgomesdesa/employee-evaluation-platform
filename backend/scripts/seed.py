@@ -1,8 +1,9 @@
 from sqlalchemy import select, text
 from sqlalchemy.orm import Session
 
+from app.data import EVALUATION_QUESTIONS
 from app.database.session import SessionLocal
-from app.models import Employee, LeaderLead
+from app.models import Employee, EvaluationQuestion, LeaderLead
 
 EMPLOYEES = (
     (1, "Alice Hartman", "alice.hartman@company.com", "CEO"),
@@ -55,6 +56,9 @@ def seed_database(session: Session) -> bool:
     existing_links = session.scalars(
         select(LeaderLead).order_by(LeaderLead.leader_id, LeaderLead.lead_id)
     ).all()
+    existing_questions = session.scalars(
+        select(EvaluationQuestion).order_by(EvaluationQuestion.id)
+    ).all()
 
     employee_fixture = set(EMPLOYEES)
     link_fixture = set(LEADER_LEADS)
@@ -63,32 +67,66 @@ def seed_database(session: Session) -> bool:
         for employee in existing_employees
     }
     link_rows = {(link.leader_id, link.lead_id) for link in existing_links}
+    question_fixture = {
+        (question.id, question.text, question.weight, question.display_order)
+        for question in EVALUATION_QUESTIONS
+    }
+    question_rows = {
+        (question.id, question.text, question.weight, question.display_order)
+        for question in existing_questions
+    }
 
-    if employee_rows == employee_fixture and link_rows == link_fixture:
-        return False
+    inserted = False
 
-    if employee_rows or link_rows:
-        raise RuntimeError(
-            "O banco já contém dados de funcionários ou hierarquia diferentes da fixture."
+    if employee_rows != employee_fixture or link_rows != link_fixture:
+        if employee_rows or link_rows:
+            raise RuntimeError(
+                "O banco já contém dados de funcionários ou hierarquia diferentes da fixture."
+            )
+
+        session.add_all(
+            Employee(id=id_, name=name, email=email, position_name=position_name)
+            for id_, name, email, position_name in EMPLOYEES
         )
-
-    session.add_all(
-        Employee(id=id_, name=name, email=email, position_name=position_name)
-        for id_, name, email, position_name in EMPLOYEES
-    )
-    session.flush()
-    session.add_all(
-        LeaderLead(leader_id=leader_id, lead_id=lead_id)
-        for leader_id, lead_id in LEADER_LEADS
-    )
-    session.flush()
-    session.execute(
-        text(
-            "SELECT setval(pg_get_serial_sequence('employee', 'id'), "
-            "(SELECT MAX(id) FROM employee), true)"
+        session.flush()
+        session.add_all(
+            LeaderLead(leader_id=leader_id, lead_id=lead_id)
+            for leader_id, lead_id in LEADER_LEADS
         )
-    )
-    return True
+        session.flush()
+        session.execute(
+            text(
+                "SELECT setval(pg_get_serial_sequence('employee', 'id'), "
+                "(SELECT MAX(id) FROM employee), true)"
+            )
+        )
+        inserted = True
+
+    if question_rows != question_fixture:
+        if question_rows:
+            raise RuntimeError(
+                "O banco já contém perguntas de avaliação diferentes da fixture."
+            )
+
+        session.add_all(
+            EvaluationQuestion(
+                id=question.id,
+                text=question.text,
+                weight=question.weight,
+                display_order=question.display_order,
+            )
+            for question in EVALUATION_QUESTIONS
+        )
+        session.flush()
+        session.execute(
+            text(
+                "SELECT setval(pg_get_serial_sequence('evaluation_question', 'id'), "
+                "(SELECT MAX(id) FROM evaluation_question), true)"
+            )
+        )
+        inserted = True
+
+    return inserted
 
 
 def main() -> None:
@@ -96,9 +134,9 @@ def main() -> None:
         inserted = seed_database(session)
 
     if inserted:
-        print("Fixture de funcionários e hierarquia carregada com sucesso.")
+        print("Fixture do desafio carregada com sucesso.")
     else:
-        print("A fixture de funcionários e hierarquia já está carregada.")
+        print("A fixture do desafio já está carregada.")
 
 
 if __name__ == "__main__":

@@ -8,6 +8,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.database.base import Base
 
 if TYPE_CHECKING:
+    from app.models.evaluation import Evaluation
     from app.models.leader_lead import LeaderLead
 
 
@@ -27,5 +28,15 @@ class Employee(Base):
     reporting_links: Mapped[list["LeaderLead"]] = relationship(
         back_populates="lead",
         foreign_keys="LeaderLead.lead_id",
+        passive_deletes=True,
+    )
+    evaluations_as_evaluator: Mapped[list["Evaluation"]] = relationship(
+        back_populates="evaluator",
+        foreign_keys="Evaluation.evaluator_id",
+        passive_deletes=True,
+    )
+    evaluations_as_employee: Mapped[list["Evaluation"]] = relationship(
+        back_populates="employee",
+        foreign_keys="Evaluation.employee_id",
         passive_deletes=True,
     )
