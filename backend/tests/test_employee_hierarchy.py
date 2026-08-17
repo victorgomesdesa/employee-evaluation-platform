@@ -1,14 +1,8 @@
-from collections.abc import Generator
-
 import pytest
-from alembic import command
-from alembic.config import Config
-from sqlalchemy import create_engine, func, select
-from sqlalchemy.engine import make_url
+from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.orm import Session
 
-from app.config import settings
 from app.models import Employee, LeaderLead
 from scripts.seed import EMPLOYEES, LEADER_LEADS, seed_database
 
@@ -21,38 +15,6 @@ EXPECTED_LEADERS = {
     "Frank Rossi",
     "Henry Patel",
 }
-
-
-@pytest.fixture(scope="module")
-def database_session() -> Generator[Session, None, None]:
-    database_url = settings.test_database_url
-    if database_url is None:
-        pytest.skip("TEST_DATABASE_URL não foi configurada.")
-
-    database_name = make_url(database_url).database or ""
-    if not database_name.endswith("_test"):
-        pytest.fail("TEST_DATABASE_URL deve apontar para um banco com sufixo _test.")
-
-    alembic_config = Config("alembic.ini")
-    alembic_config.attributes["database_url"] = database_url
-    command.downgrade(alembic_config, "base")
-    command.upgrade(alembic_config, "head")
-
-    engine = create_engine(database_url)
-    testing_session = sessionmaker(bind=engine, autoflush=False, autocommit=False)
-
-    try:
-        with testing_session() as session:
-            with session.begin():
-                assert seed_database(session) is True
-            with session.begin():
-                assert seed_database(session) is False
-            yield session
-    finally:
-        engine.dispose()
-        command.downgrade(alembic_config, "base")
-
-
 @pytest.mark.integration
 def test_seed_contains_exactly_twenty_employees(database_session: Session) -> None:
     employee_count = database_session.scalar(select(func.count()).select_from(Employee))
