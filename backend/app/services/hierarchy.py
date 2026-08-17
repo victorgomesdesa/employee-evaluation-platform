@@ -1,5 +1,5 @@
 from app.repositories import HierarchyRepository
-from app.schemas import Relationship, SubordinateResponse
+from app.schemas import LeaderResponse, Relationship, SubordinateResponse
 
 
 class HierarchyService:
@@ -21,6 +21,18 @@ class HierarchyService:
                     else Relationship.INDIRECT
                 ),
                 depth=record.depth,
+            )
+            for record in records
+        ]
+
+    def get_leaders(self) -> list[LeaderResponse]:
+        records = self._repository.get_leaders()
+
+        return [
+            LeaderResponse(
+                id=record.id,
+                name=record.name,
+                position_name=record.position_name,
             )
             for record in records
         ]

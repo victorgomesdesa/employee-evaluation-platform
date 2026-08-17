@@ -13,6 +13,13 @@ class SubordinateRecord:
     depth: int
 
 
+@dataclass(frozen=True, slots=True)
+class LeaderRecord:
+    id: int
+    name: str
+    position_name: str
+
+
 class HierarchyRepository:
     def __init__(self, session: Session) -> None:
         self._session = session
@@ -57,6 +64,33 @@ class HierarchyRepository:
                 email=row["email"],
                 position_name=row["position_name"],
                 depth=row["depth"],
+            )
+            for row in rows
+        ]
+
+    def get_leaders(self) -> list[LeaderRecord]:
+        query = text(
+            """
+            SELECT
+                employee.id,
+                employee.name,
+                employee.position_name
+            FROM employee
+            WHERE EXISTS (
+                SELECT 1
+                FROM leader_lead
+                WHERE leader_lead.leader_id = employee.id
+            )
+            ORDER BY employee.id
+            """
+        )
+        rows = self._session.execute(query).mappings()
+
+        return [
+            LeaderRecord(
+                id=row["id"],
+                name=row["name"],
+                position_name=row["position_name"],
             )
             for row in rows
         ]

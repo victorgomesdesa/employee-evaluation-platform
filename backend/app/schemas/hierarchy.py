@@ -8,6 +8,14 @@ class Relationship(str, Enum):
     INDIRECT = "indirect"
 
 
+class LeaderResponse(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
+    id: int
+    name: str
+    position_name: str = Field(alias="positionName")
+
+
 class SubordinateResponse(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 

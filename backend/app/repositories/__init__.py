@@ -1,3 +1,7 @@
-from app.repositories.hierarchy import HierarchyRepository, SubordinateRecord
+from app.repositories.hierarchy import (
+    HierarchyRepository,
+    LeaderRecord,
+    SubordinateRecord,
+)
 
-__all__ = ["HierarchyRepository", "SubordinateRecord"]
+__all__ = ["HierarchyRepository", "LeaderRecord", "SubordinateRecord"]

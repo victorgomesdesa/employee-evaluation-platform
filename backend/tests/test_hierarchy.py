@@ -1,28 +1,11 @@
-from collections.abc import Generator
-
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy.orm import Session
-
-from app.database.session import get_session
-from app.main import app
-
-
-@pytest.fixture
-def api_client(database_session: Session) -> Generator[TestClient, None, None]:
-    app.dependency_overrides[get_session] = lambda: database_session
-
-    try:
-        with TestClient(app) as client:
-            yield client
-    finally:
-        app.dependency_overrides.clear()
 
 
 def get_subordinates(client: TestClient, employee_id: int) -> list[dict[str, object]]:
     response = client.get(
         "/api/me/subordinates",
-        params={"actingEmployeeId": employee_id},
+        headers={"X-Leader-Id": str(employee_id)},
     )
 
     assert response.status_code == 200
@@ -146,10 +129,11 @@ def test_relationship_matches_relative_depth(api_client: TestClient) -> None:
     )
 
 
-def test_subordinates_requires_acting_employee_id(api_client: TestClient) -> None:
-    response = api_client.get("/api/me/subordinates")
+def test_subordinates_requires_x_leader_id(api_client: TestClient) -> None:
+    response = api_client.get(
+        "/api/me/subordinates",
+        params={"actingEmployeeId": 2},
+    )
 
     assert response.status_code == 400
-    assert response.json() == {
-        "detail": "O identificador do funcionário atuante é obrigatório."
-    }
+    assert response.json() == {"detail": "X-Leader-Id é obrigatório."}

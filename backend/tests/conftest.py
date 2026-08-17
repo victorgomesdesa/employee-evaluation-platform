@@ -3,11 +3,14 @@ from collections.abc import Generator
 import pytest
 from alembic import command
 from alembic.config import Config
+from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.engine import make_url
 from sqlalchemy.orm import Session, sessionmaker
 
 from app.config import settings
+from app.database.session import get_session
+from app.main import app
 from scripts.seed import seed_database
 
 
@@ -39,3 +42,14 @@ def database_session() -> Generator[Session, None, None]:
     finally:
         engine.dispose()
         command.downgrade(alembic_config, "base")
+
+
+@pytest.fixture
+def api_client(database_session: Session) -> Generator[TestClient, None, None]:
+    app.dependency_overrides[get_session] = lambda: database_session
+
+    try:
+        with TestClient(app) as client:
+            yield client
+    finally:
+        app.dependency_overrides.clear()
